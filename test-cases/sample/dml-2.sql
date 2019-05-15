@@ -1,1 +1,1 @@
-INSERT INTO tmp (`name`) VALUES (`tt2`)
+INSERT INTO tmp (`name`) VALUES ("tt2")

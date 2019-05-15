@@ -53,7 +53,7 @@ func (testCase *TestCase) runDDL() error {
 	if ddlClient, err := sql.Open("mysql", testCase.DSN); err != nil {
 		return err
 	} else if err := ddlClient.Ping(); err != nil {
-		log.Println("ping database error: ", testCase.DSN)
+		log.Println("ping database error: ", testCase.DSN, ", ", err)
 		return err
 	} else {
 		testCase.DDL.DB = ddlClient
