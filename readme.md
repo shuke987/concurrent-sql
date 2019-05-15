@@ -25,7 +25,7 @@ dml section: dml files with sqls to run, and how many times it will repeat.
 At least you need one dml file. Otherwise nothing is done.
 
 verify: 
-
+```json
     [
       {
         "run_at": "dml_start", // run unil dml is finished.
@@ -52,3 +52,18 @@ verify:
         ]
       }
     ]
+```
+    
+### generate case expect string
+
+You can use below command to generate the expect result of one specified query.
+Just copy the output and fill the expect field in verify json file.
+
+```
+## the default value of dsn is 'root@tcp(127.0.0.1:4000)/?allowNativePasswords=true&maxAllowedPacket=0'
+./concurrent-sql --gen=true --query="explain select * from mysql.user" --dsn="db-dsn-string"
+```
+Example output
+```
+TableReader_5\t10000.00\troot\tdata:TableScan_4\n└─TableScan_4\t10000.00\tcop\ttable:user, range:[-inf,+inf], keep order:false, stats:pseudo
+```

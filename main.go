@@ -8,6 +8,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 )
 
 var paramDir = flag.String("dir", "test-cases", "specify the test case directory")
@@ -55,6 +56,8 @@ func printExpectResult(dsn, query string) {
 	if err != nil {
 		log.Fatal("query from failed", err)
 	}
-	fmt.Println("Expect result is:")
-	fmt.Println(result.ToOneString())
+	str := result.ToOneString()
+	str = strings.ReplaceAll(str, "\n", "\\n")
+	str = strings.ReplaceAll(str, "\t", "\\t")
+	fmt.Println(str)
 }

@@ -44,14 +44,14 @@ func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 		select {
 		case msg1 := <-shutdown:
 			{
-				fmt.Println("shutdown signal received", msg1)
+				log.Println("shutdown signal received", msg1)
 				return
 			}
 		default:
-			fmt.Println("no shutdown signal")
+			log.Println("no shutdown signal")
 		}
 
-		fmt.Println("start to execute verify case")
+		log.Println("start to execute verify case")
 		err := v.Assert(db)
 		if err != nil {
 			c <- fmt.Sprintf("%v", err)
@@ -60,7 +60,7 @@ func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 		if v.RunAt == RUN_ONETIME {
 			return
 		}
-		fmt.Printf("execute done, sleep, %d", v.Sleep)
+		log.Printf("execute done, sleep, %d", v.Sleep)
 		time.Sleep(time.Duration(v.Sleep) * time.Second)
 	}
 }
@@ -94,7 +94,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 			return err
 		}
 		if as.Type == ASSERT_TYPE_ADMIN {
-			fmt.Println("admin check without error")
+			log.Println("admin check without error")
 			continue
 		} else {
 			equals := true
@@ -104,10 +104,10 @@ func (verify *Verify) Assert(db *sql.DB) error {
 				equals = false
 				//now adjust
 				for _, adjust := range as.Adjust {
-					fmt.Printf("try to adjust sql: %s\n", adjust)
+					log.Printf("try to adjust sql: %s\n", adjust)
 					_, err := db.Exec(adjust)
 					if err != nil {
-						fmt.Printf("execute adjust failed\n")
+						log.Printf("execute adjust failed\n")
 						return err
 					}
 					// check again
@@ -119,7 +119,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 						equals = true
 						break
 					} else {
-						fmt.Println("Result is not equals to Expect")
+						log.Println("Result is not equals to Expect")
 						printDiff(as.Expect, queryResult)
 					}
 				}
@@ -127,6 +127,8 @@ func (verify *Verify) Assert(db *sql.DB) error {
 			if !equals {
 				fmt.Println("the sql result not equals")
 				return errors.New("verify case failed")
+			} else {
+				log.Println("plan assert successfully!")
 			}
 		}
 	}
