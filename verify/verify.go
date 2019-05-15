@@ -13,6 +13,7 @@ import (
 )
 
 const RUN_ONETIME = "dml_end"
+const ASSERT_TYPE_ADMIN = "admin_check"
 
 type SQLAssert interface {
 	Assert(db *sql.DB) error
@@ -89,35 +90,39 @@ func (verify *Verify) Assert(db *sql.DB) error {
 		if err != nil {
 			return err
 		}
-		equals := true
-		if queryResult != as.Expect {
-			fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
-			equals = false
-			//now adjust
-			for _, adjust := range as.Adjust {
-				fmt.Printf("try to adjust sql: %s\n", adjust)
-				_, err := db.Exec(adjust)
-				if err != nil {
-					fmt.Printf("execute adjust failed\n")
-					return err
-				}
-				// check again
-				queryResult, err = getAllRecordAsString(db, as.SQL)
-				if err != nil {
-					return err
-				}
-				if queryResult == as.Expect {
-					equals = true
-					break
-				} else {
-					fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+		if as.Type == ASSERT_TYPE_ADMIN {
+			fmt.Println("admin check without error")
+			continue
+		} else {
+			equals := true
+			if queryResult != as.Expect {
+				fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+				equals = false
+				//now adjust
+				for _, adjust := range as.Adjust {
+					fmt.Printf("try to adjust sql: %s\n", adjust)
+					_, err := db.Exec(adjust)
+					if err != nil {
+						fmt.Printf("execute adjust failed\n")
+						return err
+					}
+					// check again
+					queryResult, err = getAllRecordAsString(db, as.SQL)
+					if err != nil {
+						return err
+					}
+					if queryResult == as.Expect {
+						equals = true
+						break
+					} else {
+						fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+					}
 				}
 			}
-		}
-
-		if !equals {
-			fmt.Println("the sql result not equals")
-			return errors.New("verify case failed")
+			if !equals {
+				fmt.Println("the sql result not equals")
+				return errors.New("verify case failed")
+			}
 		}
 	}
 	return nil
