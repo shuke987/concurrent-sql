@@ -93,11 +93,13 @@ func (testCase *TestCase) runDMLAndVerify() error {
 	var chans []chan string
 	shutdown := make(chan struct{})
 	errorOccurs := false
+	dmlCount := 0
 
 	for i := 0; i < len(testCase.DML); i++ {
 		ch := make(chan string)
 		go testCase.DML[i].RunAsync(ch, shutdown)
 		chans = append(chans, ch)
+		dmlCount++
 	}
 
 	// run verify.
@@ -115,11 +117,27 @@ func (testCase *TestCase) runDMLAndVerify() error {
 	}
 
 	remaining := len(cases)
+	closeAlready := false
+
 	for remaining > 0 {
 		chosen, value, ok := reflect.Select(cases)
 		if !ok {
 			cases[chosen].Chan = reflect.ValueOf(nil)
 			remaining -= 1
+
+			if chosen < dmlCount {
+				for i := 0; i < dmlCount; i++ {
+					if cases[i].Chan != reflect.ValueOf(nil) {
+						break
+					} else if i == dmlCount-1 {
+						if !closeAlready {
+							close(shutdown)
+							closeAlready = true
+						}
+					}
+				}
+			}
+
 			continue
 		} else {
 			if v := value.String(); v != "" {
@@ -128,7 +146,10 @@ func (testCase *TestCase) runDMLAndVerify() error {
 				// notify all go routines to quit.
 				if !errorOccurs {
 					errorOccurs = true
-					close(shutdown)
+					if !closeAlready {
+						close(shutdown)
+						closeAlready = true
+					}
 				}
 			}
 		}
