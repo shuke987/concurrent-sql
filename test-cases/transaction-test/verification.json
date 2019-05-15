@@ -5,9 +5,9 @@
     "asserts":[
       {
         "type": "admin_check",
-        "sql": "select * from mysql.user;",
+        "sql": "admin check table t;",
         "adjust":[],
-        "expect": "xxx"
+        "expect": ""
       }
     ]
   }

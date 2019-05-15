@@ -1,0 +1,1 @@
+update t set i = 3 where i = 6;

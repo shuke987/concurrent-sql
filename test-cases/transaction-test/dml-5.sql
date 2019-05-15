@@ -1,0 +1,1 @@
+delete from t where i = 6;

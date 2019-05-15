@@ -5,6 +5,8 @@ import (
 	"concurrent-sql/dml"
 	"concurrent-sql/verify"
 	"database/sql"
+	"errors"
+	"fmt"
 	"log"
 	"reflect"
 )
@@ -89,7 +91,7 @@ func (testCase *TestCase) runDDL() error {
 	return nil
 }
 
-func (testCase *TestCase) runDMLAndVerify() error {
+func (testCase *TestCase) runDMLAndVerify() (err error) {
 	var chans []chan string
 	shutdown := make(chan struct{})
 	errorOccurs := false
@@ -146,6 +148,7 @@ func (testCase *TestCase) runDMLAndVerify() error {
 				// notify all go routines to quit.
 				if !errorOccurs {
 					errorOccurs = true
+					err = errors.New(v)
 					if !closeAlready {
 						close(shutdown)
 						closeAlready = true
@@ -159,10 +162,10 @@ func (testCase *TestCase) runDMLAndVerify() error {
 		testCase.afterFail()
 	}
 
-	return nil
+	return
 }
 
-func (testCase *TestCase) runAfterDML() error {
+func (testCase *TestCase) runAfterDML() (err error) {
 	var chans []chan string
 	shutdown := make(chan struct{})
 	errorOccurs := false
@@ -190,8 +193,9 @@ func (testCase *TestCase) runAfterDML() error {
 			continue
 		} else {
 			if v := value.String(); v != "" {
-				log.Println("error occurs. verify id: ", chosen, ", ", v)
-
+				errStr := fmt.Sprintf("error occurs. verify id: %d. err=%s", chosen, v)
+				log.Println(errStr)
+				err = errors.New(errStr)
 				// notify all go routines to quit.
 				if !errorOccurs {
 					errorOccurs = true
@@ -205,7 +209,7 @@ func (testCase *TestCase) runAfterDML() error {
 		testCase.afterFail()
 	}
 
-	return nil
+	return
 }
 
 func (testCase *TestCase) afterFail() {
