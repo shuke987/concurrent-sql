@@ -7,7 +7,7 @@
         "type": "admin_check",
         "sql": "select * from mysql.user;",
         "adjust":[],
-        "expect": "xxx"
+        "expect": "TableReader_5   10000.00        root    data:TableScan_4\n└─TableScan_4   10000.00        cop     table:user, range:[-inf,+inf], keep order:false, stats:pseudo"
       }
     ]
   },
@@ -19,7 +19,7 @@
         "type": "plan",
         "sql": "explain select * from mysql.user; ",
         "adjust":["select * from mysql.user;", "select * from mysql.user;"],
-        "expect": "xxx"
+        "expect": "TableReader_5 10000.00 root data:TableScan_4\n└─TableScan_4 10000.00 cop table:user, range:[-inf,+inf], keep order:false, stats:pseudo"
       }
     ]
   }

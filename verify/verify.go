@@ -162,7 +162,7 @@ func (result *SqlQueryResult) ToOneString() string {
 
 func getAllRecordAsString(db *sql.DB, query string) (string, error) {
 	var str string
-	queryResult, err := getQueryResult(db, query)
+	queryResult, err := GetQueryResult(db, query)
 	if err != nil {
 		return str, err
 	}
@@ -170,7 +170,7 @@ func getAllRecordAsString(db *sql.DB, query string) (string, error) {
 }
 
 //get the query result
-func getQueryResult(db *sql.DB, query string) (*SqlQueryResult, error) {
+func GetQueryResult(db *sql.DB, query string) (*SqlQueryResult, error) {
 	result, err := db.Query(query)
 	if err != nil {
 		return nil, err
