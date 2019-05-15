@@ -3,16 +3,18 @@ package tests
 import (
 	"concurrent-sql/ddl"
 	"concurrent-sql/dml"
+	"concurrent-sql/verify"
 	"database/sql"
 	"log"
 	"reflect"
 )
 
 type TestCase struct {
-	DSN string
-	DB  string
-	DDL ddl.DDL
-	DML []*dml.DML
+	DSN           string
+	DB            string
+	DDL           ddl.DDL
+	DML           []*dml.DML
+	Verifications []verify.Verify
 }
 
 func (testCase *TestCase) Load(cfg *Config) error {
@@ -32,6 +34,12 @@ func (testCase *TestCase) Load(cfg *Config) error {
 		d.DSN = cfg.DMLdsn
 
 		testCase.DML = append(testCase.DML, d)
+	}
+
+	if v, err := verify.LoadVerificationFromFile(cfg.VerificationFile); err != nil {
+		return err
+	} else {
+		testCase.Verifications = v
 	}
 
 	return nil
@@ -83,6 +91,13 @@ func (testCase *TestCase) runDMLAndVerify() error {
 	for i := 0; i < len(testCase.DML); i++ {
 		ch := make(chan string)
 		go testCase.DML[i].RunAsync(ch, shutdown)
+		chans = append(chans, ch)
+	}
+
+	// run verify.
+	for i := 0; i < len(testCase.Verifications); i++ {
+		ch := make(chan string)
+		go testCase.Verifications[i].RunAsync(ch, shutdown)
 		chans = append(chans, ch)
 	}
 

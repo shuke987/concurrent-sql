@@ -17,6 +17,11 @@ type Verify struct {
 	Asserts []Assert `json:"asserts,omitempty"`
 }
 
+func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) error {
+	close(c)
+	return nil
+}
+
 type Assert struct {
 	Type   string   `json:"type,omitempty"`
 	SQL    string   `json:"sql,omitempty"`
