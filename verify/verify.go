@@ -10,6 +10,9 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 const RUN_ONETIME = "dml_end"
@@ -96,7 +99,8 @@ func (verify *Verify) Assert(db *sql.DB) error {
 		} else {
 			equals := true
 			if queryResult != as.Expect {
-				fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+				fmt.Println("Result is not equals to Expect")
+				printDiff(as.Expect, queryResult)
 				equals = false
 				//now adjust
 				for _, adjust := range as.Adjust {
@@ -115,7 +119,8 @@ func (verify *Verify) Assert(db *sql.DB) error {
 						equals = true
 						break
 					} else {
-						fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+						fmt.Println("Result is not equals to Expect")
+						printDiff(as.Expect, queryResult)
 					}
 				}
 			}
@@ -256,4 +261,25 @@ func (result *SqlQueryResult) String() string {
 	}
 	push(splitLine)
 	return strings.Join(lines, "\n")
+}
+
+func printDiff(content1, content2 string) {
+	green := color.New(color.FgGreen).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
+	patch := diffmatchpatch.New()
+	diff := patch.DiffMain(content1, content2, false)
+	var newMySQLContent, newTiDBContent bytes.Buffer
+	for _, d := range diff {
+		switch d.Type {
+		case diffmatchpatch.DiffEqual:
+			newMySQLContent.WriteString(d.Text)
+			newTiDBContent.WriteString(d.Text)
+		case diffmatchpatch.DiffDelete:
+			newMySQLContent.WriteString(red(d.Text))
+		case diffmatchpatch.DiffInsert:
+			newTiDBContent.WriteString(green(d.Text))
+		}
+	}
+	fmt.Print(newMySQLContent.String())
+	fmt.Println(newTiDBContent.String())
 }
