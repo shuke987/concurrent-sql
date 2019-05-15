@@ -39,6 +39,9 @@ func (testCase *TestCase) Load(cfg *Config) error {
 	if v, err := verify.LoadVerificationFromFile(cfg.VerificationFile); err != nil {
 		return err
 	} else {
+		for i := range v {
+			v[i].DSN = cfg.DMLdsn
+		}
 		testCase.Verifications = v
 	}
 
@@ -51,6 +54,10 @@ func (testCase *TestCase) Run() error {
 	}
 
 	if err := testCase.runDMLAndVerify(); err != nil {
+		return err
+	}
+
+	if err := testCase.runAfterDML(); err != nil {
 		return err
 	}
 
@@ -96,9 +103,57 @@ func (testCase *TestCase) runDMLAndVerify() error {
 
 	// run verify.
 	for i := 0; i < len(testCase.Verifications); i++ {
-		ch := make(chan string)
-		go testCase.Verifications[i].RunAsync(ch, shutdown)
-		chans = append(chans, ch)
+		if testCase.Verifications[i].RunAt != "dml_end" {
+			ch := make(chan string)
+			go testCase.Verifications[i].RunAsync(ch, shutdown)
+			chans = append(chans, ch)
+		}
+	}
+
+	cases := make([]reflect.SelectCase, len(chans))
+	for i, ch := range chans {
+		cases[i] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ch)}
+	}
+
+	remaining := len(cases)
+	for remaining > 0 {
+		chosen, value, ok := reflect.Select(cases)
+		if !ok {
+			cases[chosen].Chan = reflect.ValueOf(nil)
+			remaining -= 1
+			continue
+		} else {
+			if v := value.String(); v != "" {
+				log.Println("error occurs. ", chosen, v)
+
+				// notify all go routines to quit.
+				if !errorOccurs {
+					errorOccurs = true
+					close(shutdown)
+				}
+			}
+		}
+	}
+
+	if errorOccurs {
+		testCase.afterFail()
+	}
+
+	return nil
+}
+
+func (testCase *TestCase) runAfterDML() error {
+	var chans []chan string
+	shutdown := make(chan struct{})
+	errorOccurs := false
+
+	// run verify.
+	for i := 0; i < len(testCase.Verifications); i++ {
+		if testCase.Verifications[i].RunAt == "dml_end" {
+			ch := make(chan string)
+			go testCase.Verifications[i].RunAsync(ch, shutdown)
+			chans = append(chans, ch)
+		}
 	}
 
 	cases := make([]reflect.SelectCase, len(chans))

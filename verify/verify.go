@@ -18,11 +18,12 @@ type Verify struct {
 	RunAt   string   `json:"run_at"`
 	Sleep   int      `json:"wait,omitempty"`
 	Asserts []Assert `json:"asserts,omitempty"`
+	DSN     string   `json:"-"`
 }
 
-func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) error {
+func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 	close(c)
-	return nil
+
 }
 
 type Assert struct {
