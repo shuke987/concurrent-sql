@@ -141,7 +141,7 @@ func (testCase *TestCase) runDMLAndVerify() error {
 			continue
 		} else {
 			if v := value.String(); v != "" {
-				log.Println("error occurs. ", chosen, v)
+				log.Println("error occurs. verify id: ", chosen, ", ", v)
 
 				// notify all go routines to quit.
 				if !errorOccurs {
@@ -190,7 +190,7 @@ func (testCase *TestCase) runAfterDML() error {
 			continue
 		} else {
 			if v := value.String(); v != "" {
-				log.Println("error occurs. ", chosen, v)
+				log.Println("error occurs. verify id: ", chosen, ", ", v)
 
 				// notify all go routines to quit.
 				if !errorOccurs {
