@@ -1,3 +1,11 @@
+package verify
+
+import (
+	"testing"
+)
+
+func TestLoadVerificationFromData(t *testing.T) {
+	var jsonData = `
 [
   {
     "run_at": "dml_start",
@@ -6,7 +14,7 @@
       {
         "type": "admin_check",
         "sql": "",
-        "adjust":[],
+        "adjust":["sss", ""],
         "expect": "xxx"
       }
     ]
@@ -23,4 +31,13 @@
       }
     ]
   }
-]
+]`
+	verifies, err := LoadVerificationFromData([]byte(jsonData))
+
+	if err != nil {
+		t.Fatalf("parse failed: err=%verifies", err)
+	}
+	if len(verifies) != 2 {
+		t.Fatalf("size not 2: size=%d", len(verifies))
+	}
+}

@@ -8,7 +8,7 @@ type PlanAssert struct {
 }
 
 func (pa *PlanAssert) Assert(db *sql.DB) error {
-	r, err := db.Exec(pa.SQL)
+	_, err := db.Exec(pa.SQL)
 	if err != nil {
 		return err
 	}
