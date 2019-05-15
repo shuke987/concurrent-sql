@@ -5,7 +5,7 @@
     "asserts":[
       {
         "type": "admin_check",
-        "sql": "",
+        "sql": "select * from mysql.user;",
         "adjust":[],
         "expect": "xxx"
       }
@@ -17,9 +17,9 @@
     "asserts": [
       {
         "type": "plan",
-        "sql": "Explain ",
-        "adjust":["sss", ""],
-        "expect": ""
+        "sql": "explain select * from mysql.user; ",
+        "adjust":["select * from mysql.user;", "select * from mysql.user;"],
+        "expect": "xxx"
       }
     ]
   }
