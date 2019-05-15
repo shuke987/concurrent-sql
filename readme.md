@@ -55,7 +55,6 @@ verify:
     
 ### more case
 in ./test-cases
-```
     
 ### generate case expect string
 
@@ -63,7 +62,7 @@ You can use below command to generate the expect result of one specified query.
 Just copy the output and fill the expect field in verify json file.
 
 ```
-## the default value of dsn is 'root@tcp(127.0.0.1:4000)/?allowNativePasswords=true&maxAllowedPacket=0'
+# the default value of dsn is 'root@tcp(127.0.0.1:4000)/?allowNativePasswords=true&maxAllowedPacket=0'
 ./concurrent-sql --gen=true --query="explain select * from mysql.user" --dsn="db-dsn-string"
 ```
 Example output
