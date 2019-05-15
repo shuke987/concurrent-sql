@@ -13,7 +13,6 @@ import (
 
 type Config struct {
 	DSN              string
-	Database         string
 	DDLFile          string
 	DMLdsn           string
 	DMLFiles         []string
@@ -80,8 +79,7 @@ func (c *Config) Load(iniPath string) error {
 
 	// global section
 	c.DSN = iniFile.Section("Global").Key("dsn").String()
-	c.Database = iniFile.Section("Global").Key("database").String()
-	if c.DSN == "" || c.Database == "" {
+	if c.DSN == "" {
 		return errors.New("invalid dsn or database name")
 	}
 
