@@ -2,8 +2,9 @@ package verify
 
 import (
 	"database/sql"
+	"encoding/json"
+	"io/ioutil"
 	"log"
-	"os"
 )
 
 type SQLAssert interface {
@@ -11,20 +12,33 @@ type SQLAssert interface {
 }
 
 type Verify struct {
-	Type  int // 1 = run at dml start.
-	Sleep int
+	RunAt   string   `json:"run_at"`
+	Sleep   int      `json:"wait,omitempty"`
+	Asserts []Assert `json:"asserts,omitempty"`
 }
 
-func LoadVerification(filePath string) ([]Verify, error) {
-	jsonFile, err := os.Open(filePath)
+type Assert struct {
+	Type   string   `json:"type,omitempty"`
+	SQL    string   `json:"sql,omitempty"`
+	Adjust []string `json:"adjust,omitempty"`
+	Expect string   `json:"expect,omitempty"`
+}
+
+func LoadVerificationFromData(jsonData []byte) ([]Verify, error) {
+	var verifies []Verify
+	err := json.Unmarshal(jsonData, &verifies)
+	return verifies, err
+}
+
+func LoadVerificationFromFile(filePath string) ([]Verify, error) {
+	jsonData, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Println("load file error, ", filePath)
 		return nil, err
 	}
+	return LoadVerificationFromData(jsonData)
+}
 
-	defer func() {
-		_ = jsonFile.Close()
-	}()
-
-	return nil, nil
+func (verify *Verify) Assert(db *sql.DB) error {
+	return nil
 }
