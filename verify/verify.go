@@ -263,23 +263,22 @@ func (result *SqlQueryResult) String() string {
 	return strings.Join(lines, "\n")
 }
 
-func printDiff(content1, content2 string) {
+func printDiff(expect, actual string) {
 	green := color.New(color.FgGreen).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
 	patch := diffmatchpatch.New()
-	diff := patch.DiffMain(content1, content2, false)
-	var newMySQLContent, newTiDBContent bytes.Buffer
+	diff := patch.DiffMain(expect, actual, false)
+	var newExpectedContent, newActualResult bytes.Buffer
 	for _, d := range diff {
 		switch d.Type {
 		case diffmatchpatch.DiffEqual:
-			newMySQLContent.WriteString(d.Text)
-			newTiDBContent.WriteString(d.Text)
+			newExpectedContent.WriteString(d.Text)
+			newActualResult.WriteString(d.Text)
 		case diffmatchpatch.DiffDelete:
-			newMySQLContent.WriteString(red(d.Text))
+			newExpectedContent.WriteString(red(d.Text))
 		case diffmatchpatch.DiffInsert:
-			newTiDBContent.WriteString(green(d.Text))
+			newActualResult.WriteString(green(d.Text))
 		}
 	}
-	fmt.Print(newMySQLContent.String())
-	fmt.Println(newTiDBContent.String())
+	fmt.Printf("Expected Result:\n%s\nActual Result:\n%s\n", newExpectedContent.String(), newActualResult.String())
 }
