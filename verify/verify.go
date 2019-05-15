@@ -10,6 +10,9 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 const RUN_ONETIME = "dml_end"
@@ -96,7 +99,8 @@ func (verify *Verify) Assert(db *sql.DB) error {
 		} else {
 			equals := true
 			if queryResult != as.Expect {
-				fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+				fmt.Println("Result is not equals to Expect")
+				printDiff(as.Expect, queryResult)
 				equals = false
 				//now adjust
 				for _, adjust := range as.Adjust {
@@ -115,7 +119,8 @@ func (verify *Verify) Assert(db *sql.DB) error {
 						equals = true
 						break
 					} else {
-						fmt.Printf("Result is not equals to Expect:\nExpect is:%s\n Actually Result is:\n%s\n", as.Expect, queryResult)
+						fmt.Println("Result is not equals to Expect")
+						printDiff(as.Expect, queryResult)
 					}
 				}
 			}
@@ -256,4 +261,24 @@ func (result *SqlQueryResult) String() string {
 	}
 	push(splitLine)
 	return strings.Join(lines, "\n")
+}
+
+func printDiff(expect, actual string) {
+	green := color.New(color.FgGreen).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
+	patch := diffmatchpatch.New()
+	diff := patch.DiffMain(expect, actual, false)
+	var newExpectedContent, newActualResult bytes.Buffer
+	for _, d := range diff {
+		switch d.Type {
+		case diffmatchpatch.DiffEqual:
+			newExpectedContent.WriteString(d.Text)
+			newActualResult.WriteString(d.Text)
+		case diffmatchpatch.DiffDelete:
+			newExpectedContent.WriteString(red(d.Text))
+		case diffmatchpatch.DiffInsert:
+			newActualResult.WriteString(green(d.Text))
+		}
+	}
+	fmt.Printf("Expected Result:\n%s\nActual Result:\n%s\n", newExpectedContent.String(), newActualResult.String())
 }
