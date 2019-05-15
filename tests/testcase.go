@@ -19,7 +19,6 @@ type TestCase struct {
 
 func (testCase *TestCase) Load(cfg *Config) error {
 	testCase.DSN = cfg.DSN
-	testCase.DB = cfg.Database
 
 	if err := testCase.DDL.Load(cfg.DDLFile); err != nil {
 		return err
@@ -189,5 +188,5 @@ func (testCase *TestCase) runAfterDML() error {
 }
 
 func (testCase *TestCase) afterFail() {
-
+	// kill local tidb.
 }

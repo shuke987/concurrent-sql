@@ -32,13 +32,15 @@ func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 		c <- fmt.Sprintf("%v", err)
 		return
 	}
+	defer func() {
+		_ = db.Close()
+	}()
 
 	for {
 		select {
 		case msg1 := <-shutdown:
 			{
 				fmt.Println("shutdown signal received", msg1)
-				close(c)
 				return
 			}
 		default:
@@ -49,9 +51,9 @@ func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 		err := v.Assert(db)
 		if err != nil {
 			c <- fmt.Sprintf("%v", err)
+			return
 		}
 		if v.RunAt == RUN_ONETIME {
-			close(c)
 			return
 		}
 		fmt.Printf("execute done, sleep, %d", v.Sleep)
