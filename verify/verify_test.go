@@ -52,7 +52,7 @@ func TestSqlQueryResult_ToOneString(t *testing.T) {
 		fmt.Printf("err=%v", err)
 		return
 	}
-	result, err := getQueryResult(db, "explain select * from mysql.user;")
+	result, err := GetQueryResult(db, "explain select * from mysql.user;")
 	if err != nil {
 		fmt.Printf("err=%v", err)
 		return
