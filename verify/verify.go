@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
+	"time"
 )
+
+const RUN_ONETIME = "dml_end"
 
 type SQLAssert interface {
 	Assert(db *sql.DB) error
@@ -22,8 +26,37 @@ type Verify struct {
 }
 
 func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
-	close(c)
+	defer close(c)
+	db, err := sql.Open("mysql", v.DSN)
+	if err != nil {
+		c <- fmt.Sprintf("%v", err)
+		return
+	}
 
+	for {
+		select {
+		case msg1 := <-shutdown:
+			{
+				fmt.Println("shutdown signal received", msg1)
+				close(c)
+				return
+			}
+		default:
+			fmt.Println("no shutdown signal")
+		}
+
+		fmt.Println("start to execute verify case")
+		err := v.Assert(db)
+		if err != nil {
+			c <- fmt.Sprintf("%v", err)
+		}
+		if v.RunAt == RUN_ONETIME {
+			close(c)
+			return
+		}
+		fmt.Printf("execute done, sleep, %d", v.Sleep)
+		time.Sleep(time.Duration(v.Sleep) * time.Second)
+	}
 }
 
 type Assert struct {
@@ -82,6 +115,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 
 		if !equals {
 			fmt.Println("the sql result not equals")
+			return errors.New("verify case failed")
 		}
 	}
 	return nil
