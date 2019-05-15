@@ -25,7 +25,7 @@ dml section: dml files with sqls to run, and how many times it will repeat.
 At least you need one dml file. Otherwise nothing is done.
 
 verify: 
-```json
+
     [
       {
         "run_at": "dml_start", // run unil dml is finished.
@@ -52,6 +52,9 @@ verify:
         ]
       }
     ]
+    
+### more case
+in ./test-cases
 ```
     
 ### generate case expect string
