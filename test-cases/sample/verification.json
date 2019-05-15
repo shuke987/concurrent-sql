@@ -1,0 +1,24 @@
+[
+  {
+    "run_at": "dml_start",
+    "wait": 0,
+    "asserts":[
+      {
+        "type": "admin_check",
+        "sql": "admin check table test2",
+        "expect": ""
+      }
+    ]
+  },
+  {
+    "run_at": "dml_end",
+    "wait": 10,
+    "asserts": [
+      {
+        "type": "plan",
+        "sql": "Explain ",
+        "expect": ""
+      }
+    ]
+  }
+]
