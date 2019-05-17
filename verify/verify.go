@@ -15,8 +15,11 @@ import (
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
-const RUN_ONETIME = "dml_end"
-const ASSERT_TYPE_ADMIN = "admin_check"
+const (
+	RUN_ONETIME       = "dml_end"
+	ASSERT_TYPE_ADMIN = "admin_check"
+	ASSERT_TYPE_PLAN  = "plan"
+)
 
 type SQLAssert interface {
 	Assert(db *sql.DB) error
@@ -70,6 +73,17 @@ type Assert struct {
 	SQL    string   `json:"sql,omitempty"`
 	Adjust []string `json:"adjust,omitempty"`
 	Expect string   `json:"expect,omitempty"`
+	Clean  []string `json:"clean,omitempty"`
+}
+
+//clean assert variable data
+func (assert *Assert) CleanEnv(db *sql.DB) {
+	for _, query := range assert.Clean {
+		_, err := GetQueryResult(db, query)
+		if err != nil {
+			log.Println("execute clean sql failed! ", query)
+		}
+	}
 }
 
 func LoadVerificationFromData(jsonData []byte) ([]Verify, error) {
@@ -89,18 +103,20 @@ func LoadVerificationFromFile(filePath string) ([]Verify, error) {
 
 func (verify *Verify) Assert(db *sql.DB) error {
 	for _, as := range verify.Asserts {
-		queryResult, err := getAllRecordAsString(db, as.SQL)
+		queryResult, err := GetQueryResult(db, as.SQL)
 		if err != nil {
 			return err
 		}
-		if as.Type == ASSERT_TYPE_ADMIN {
+		switch as.Type {
+		case ASSERT_TYPE_ADMIN:
 			log.Println("admin check without error")
-			continue
-		} else {
+		default:
+			stringFunc := queryResult.getQueryResultStringFunc(as.Type)
+			queryResultStr := stringFunc()
 			equals := true
-			if queryResult != as.Expect {
+			if queryResultStr != as.Expect {
 				fmt.Println("Result is not equals to Expect")
-				printDiff(as.Expect, queryResult)
+				printDiff(as.Expect, queryResultStr)
 				equals = false
 				//now adjust
 				for _, adjust := range as.Adjust {
@@ -111,19 +127,25 @@ func (verify *Verify) Assert(db *sql.DB) error {
 						return err
 					}
 					// check again
-					queryResult, err = getAllRecordAsString(db, as.SQL)
+
+					queryResult, err := GetQueryResult(db, as.SQL)
 					if err != nil {
 						return err
 					}
-					if queryResult == as.Expect {
+					stringFunc := queryResult.getQueryResultStringFunc(as.Type)
+					queryResultStr = stringFunc()
+					if queryResultStr == as.Expect {
 						equals = true
 						break
 					} else {
 						log.Println("Result is not equals to Expect")
-						printDiff(as.Expect, queryResult)
+						printDiff(as.Expect, queryResultStr)
 					}
 				}
 			}
+
+			//let's clean env first
+			as.CleanEnv(db)
 			if !equals {
 				fmt.Println("the sql result not equals")
 				return errors.New("verify case failed")
@@ -131,6 +153,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 				log.Println("plan assert successfully!")
 			}
 		}
+
 	}
 	return nil
 }
@@ -173,6 +196,7 @@ func getAllRecordAsString(db *sql.DB, query string) (string, error) {
 
 //get the query result
 func GetQueryResult(db *sql.DB, query string) (*SqlQueryResult, error) {
+	log.Println("executing sql", query)
 	result, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -283,4 +307,28 @@ func printDiff(expect, actual string) {
 		}
 	}
 	fmt.Printf("Expected Result:\n%s\nActual Result:\n%s\n", newExpectedContent.String(), newActualResult.String())
+}
+
+func (result *SqlQueryResult) getPlanScanType() string {
+	if result.data == nil || result.header == nil {
+		return "no result"
+	}
+	for _, row := range result.data {
+		firstCol := string(row[0])
+		if strings.Contains(firstCol, "IndexScan") {
+			return "Index"
+		} else if strings.Contains(firstCol, "TableScan") {
+			return "Table"
+		}
+	}
+	return ""
+}
+
+func (result *SqlQueryResult) getQueryResultStringFunc(compareType string) func() string {
+	switch compareType {
+	case ASSERT_TYPE_PLAN:
+		return result.getPlanScanType
+	default:
+		return result.ToOneString
+	}
 }

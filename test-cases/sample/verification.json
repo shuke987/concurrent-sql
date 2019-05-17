@@ -1,13 +1,13 @@
 [
   {
-    "run_at": "dml_start",
-    "wait": 0,
-    "asserts":[
+    "run_at": "dml_end",
+    "wait": 10,
+    "asserts": [
       {
-        "type": "admin_check",
-        "sql": "select * from mysql.user;",
-        "adjust":[],
-        "expect": "xxx"
+        "type": "query",
+        "sql": "EXPLAIN SELECT * FROM mysql.user;",
+        "adjust":["ANALYZE TABLE mysql.user;"],
+        "expect": "Limit_11\t1.00\troot\toffset:0, count:1\n└─TableReader_22\t1.00\troot\tdata:Limit_21\n  └─Limit_21\t1.00\tcop\toffset:0, count:1\n    └─Selection_20\t1.00\tcop\teq(test2.unknown_correlation.a, 2)\n      └─TableScan_19\t4.17\tcop\ttable:unknown_correlation, range:[-inf,+inf], keep order:true"
       }
     ]
   }
