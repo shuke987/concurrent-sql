@@ -316,9 +316,9 @@ func (result *SqlQueryResult) getPlanScanType() string {
 	for _, row := range result.data {
 		firstCol := string(row[0])
 		if strings.Contains(firstCol, "IndexScan") {
-			return "Index"
+			return "IndexScan"
 		} else if strings.Contains(firstCol, "TableScan") {
-			return "Table"
+			return "TableScan"
 		}
 	}
 	return ""

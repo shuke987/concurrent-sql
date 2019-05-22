@@ -7,7 +7,7 @@
         "type": "plan",
         "sql": "EXPLAIN SELECT * FROM unknown_correlation WHERE a = 2 ORDER BY id limit 1;",
         "adjust": ["ANALYZE TABLE unknown_correlation;"],
-        "expect": "Table",
+        "expect": "TableScan",
         "clean": ["delete from unknown_correlation where id=1;"]
       }
     ]
