@@ -1,0 +1,274 @@
+[
+  {
+    "run_at": "dml_end",
+    "wait": 0,
+    "asserts": [
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 100;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2021-05-16' and date_add('2021-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 100;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2021-05-16' and date_add('2021-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_100 between '2019-06-16' and date_add('2019-06-17', interval 10 day) and id > 1 order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_90 between '2019-05-16' and '2019-05-17' order by id limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_90 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_90 between '2019-05-16' and '2019-05-17' order by id limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_90 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_75 between '2019-05-16' and '2019-05-17' order by id limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_75 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_75 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_75 between '2019-05-16' and '2019-05-17' order by id limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_75 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_75 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_50 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_50 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_50 between '2019-05-16' and '2019-05-17' order by id desc limit 1000;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_50 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_25 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where desc_25 between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where rand between '2019-05-16' and date_add('2019-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "TableScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where rand between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where rand between '2021-05-16' and date_add('2021-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where rand between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_100 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_100 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_75 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": ["set session tidb_opt_correlation_exp_factor=3"],
+        "expect": "IndexScan",
+        "clean": ["set session tidb_opt_correlation_exp_factor=1"]
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_50 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": ["set session tidb_opt_correlation_exp_factor=3"],
+        "expect": "IndexScan",
+        "clean": ["set session tidb_opt_correlation_exp_factor=1"]
+      },
+      {
+        "type": "plan",
+        "sql": "explain select id from tbl where asc_25 between '2020-05-16' and date_add('2020-05-17', interval 100 day) and asc_90 between '2020-05-16' and date_add('2020-05-17', interval 100 day) order by id limit 1;",
+        "adjust": [],
+        "expect": "IndexScan",
+        "clean": []
+      }
+    ]
+  }
+]
