@@ -12,7 +12,7 @@ type DDL struct {
 }
 
 func (d *DDL) Load(path string) (err error) {
-	d.Queries, err = util.ReadFileLines(path)
+	d.Queries, err = util.GetSQLStatements(path)
 	return err
 }
 

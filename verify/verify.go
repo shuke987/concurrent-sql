@@ -196,7 +196,7 @@ func getAllRecordAsString(db *sql.DB, query string) (string, error) {
 
 //get the query result
 func GetQueryResult(db *sql.DB, query string) (*SqlQueryResult, error) {
-	log.Println("executing sql", query)
+	log.Println("executing sql:", query)
 	result, err := db.Query(query)
 	if err != nil {
 		return nil, err

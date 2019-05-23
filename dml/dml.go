@@ -14,7 +14,7 @@ type DML struct {
 }
 
 func (d *DML) Load(path string) (err error) {
-	d.SQLs, err = util.ReadFileLines(path)
+	d.SQLs, err = util.GetSQLStatements(path)
 	return err
 }
 
