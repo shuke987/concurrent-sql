@@ -48,7 +48,7 @@ func (d *DML) RunAsync(c chan string, shutdown chan struct{}) {
 				errStr := fmt.Sprintf("sql execute error: %s", err)
 				log.Println(errStr)
 				c <- fmt.Sprintf(errStr)
-				//return
+				return
 			}
 		}
 	}
