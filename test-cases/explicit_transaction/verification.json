@@ -1,0 +1,14 @@
+[
+  {
+    "run_at": "dml_start",
+    "wait": 0,
+    "asserts":[
+      {
+        "type": "admin_check",
+        "sql": "admin check table t;",
+        "adjust":[],
+        "expect": ""
+      }
+    ]
+  }
+]

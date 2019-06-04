@@ -3,12 +3,13 @@ package tests
 import (
 	"errors"
 	"fmt"
-	"github.com/go-ini/ini"
 	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/go-ini/ini"
 )
 
 type Config struct {

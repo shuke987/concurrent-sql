@@ -28,7 +28,7 @@ verify:
 
     [
       {
-        "run_at": "dml_start", // run unil dml is finished.
+        "run_at": "dml_start", // run until dml is finished.
         "wait": 0, // interval between two repeat run.
         "asserts":[
           {

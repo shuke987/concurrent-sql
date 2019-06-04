@@ -1,14 +1,14 @@
 package main
 
 import (
-	"concurrent-sql/tests"
-	"concurrent-sql/verify"
 	"database/sql"
 	"flag"
-	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/shuke987/concurrent-sql/tests"
+	"github.com/shuke987/concurrent-sql/verify"
 )
 
 var paramDir = flag.String("dir", "test-cases", "specify the test case directory")
@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	log.Printf("begin test")
+	log.Println("begin test")
 	log.Printf("dir=%s", *paramDir)
 
 	var testCases []*tests.TestCase
@@ -44,7 +44,7 @@ func main() {
 		}
 	}
 
-	log.Printf("test finish")
+	log.Println("test finish")
 }
 
 func printExpectResult(dsn, query string) {
@@ -59,5 +59,5 @@ func printExpectResult(dsn, query string) {
 	str := result.ToOneString()
 	str = strings.ReplaceAll(str, "\n", "\\n")
 	str = strings.ReplaceAll(str, "\t", "\\t")
-	fmt.Println(str)
+	log.Println(str)
 }

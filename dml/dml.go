@@ -1,10 +1,11 @@
 package dml
 
 import (
-	"concurrent-sql/util"
 	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/shuke987/concurrent-sql/util"
 )
 
 type DML struct {
@@ -14,7 +15,7 @@ type DML struct {
 }
 
 func (d *DML) Load(path string) (err error) {
-	d.SQLs, err = util.GetSQLStatements(path)
+	d.SQLs, err = util.ReadFileLines(path)
 	return err
 }
 
@@ -47,7 +48,7 @@ func (d *DML) RunAsync(c chan string, shutdown chan struct{}) {
 				errStr := fmt.Sprintf("sql execute error: %s", err)
 				log.Println(errStr)
 				c <- fmt.Sprintf(errStr)
-				return
+				//return
 			}
 		}
 	}

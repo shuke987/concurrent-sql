@@ -1,9 +1,10 @@
 package ddl
 
 import (
-	"concurrent-sql/util"
 	"database/sql"
 	"log"
+
+	"github.com/shuke987/concurrent-sql/util"
 )
 
 type DDL struct {
@@ -12,7 +13,7 @@ type DDL struct {
 }
 
 func (d *DDL) Load(path string) (err error) {
-	d.Queries, err = util.GetSQLStatements(path)
+	d.Queries, err = util.ReadFileLines(path)
 	return err
 }
 

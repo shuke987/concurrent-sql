@@ -1,14 +1,15 @@
 package tests
 
 import (
-	"concurrent-sql/ddl"
-	"concurrent-sql/dml"
-	"concurrent-sql/verify"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"reflect"
+
+	"github.com/shuke987/concurrent-sql/ddl"
+	"github.com/shuke987/concurrent-sql/dml"
+	"github.com/shuke987/concurrent-sql/verify"
 )
 
 type TestCase struct {

@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	RUN_ONETIME       = "dml_end"
-	ASSERT_TYPE_ADMIN = "admin_check"
-	ASSERT_TYPE_PLAN  = "plan"
+	RunOnetime      = "dml_end"
+	AssertTypeAdmin = "admin_check"
+	AssertTypePlan  = "plan"
 )
 
 type SQLAssert interface {
@@ -32,9 +32,9 @@ type Verify struct {
 	DSN     string   `json:"-"`
 }
 
-func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
+func (verify *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 	defer close(c)
-	db, err := sql.Open("mysql", v.DSN)
+	db, err := sql.Open("mysql", verify.DSN)
 	if err != nil {
 		c <- fmt.Sprintf("%v", err)
 		return
@@ -55,16 +55,16 @@ func (v *Verify) RunAsync(c chan string, shutdown chan struct{}) {
 		}
 
 		log.Println("start to execute verify case")
-		err := v.Assert(db)
+		err := verify.Assert(db)
 		if err != nil {
 			c <- fmt.Sprintf("%v", err)
 			return
 		}
-		if v.RunAt == RUN_ONETIME {
+		if verify.RunAt == RunOnetime {
 			return
 		}
-		log.Printf("execute done, sleep, %d", v.Sleep)
-		time.Sleep(time.Duration(v.Sleep) * time.Second)
+		log.Printf("execute done, sleep, %d", verify.Sleep)
+		time.Sleep(time.Duration(verify.Sleep) * time.Second)
 	}
 }
 
@@ -76,7 +76,7 @@ type Assert struct {
 	Clean  []string `json:"clean,omitempty"`
 }
 
-//clean assert variable data
+// clean assert variable data
 func (assert *Assert) CleanEnv(db *sql.DB) {
 	for _, query := range assert.Clean {
 		_, err := GetQueryResult(db, query)
@@ -108,7 +108,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 			return err
 		}
 		switch as.Type {
-		case ASSERT_TYPE_ADMIN:
+		case AssertTypeAdmin:
 			log.Println("admin check without error")
 		default:
 			stringFunc := queryResult.getQueryResultStringFunc(as.Type)
@@ -118,7 +118,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 				fmt.Println("Result is not equals to Expect")
 				printDiff(as.Expect, queryResultStr)
 				equals = false
-				//now adjust
+				// now adjust
 				for _, adjust := range as.Adjust {
 					log.Printf("try to adjust sql: %s\n", adjust)
 					_, err := db.Exec(adjust)
@@ -144,7 +144,7 @@ func (verify *Verify) Assert(db *sql.DB) error {
 				}
 			}
 
-			//let's clean env first
+			// let's clean env first
 			as.CleanEnv(db)
 			if !equals {
 				fmt.Println("the sql result not equals")
@@ -164,7 +164,7 @@ type SqlQueryResult struct {
 	columnTypes []*sql.ColumnType
 }
 
-//append all rows to one string, rows are split by \n and columns are split by \t
+// append all rows to one string, rows are split by \n and columns are split by \t
 func (result *SqlQueryResult) ToOneString() string {
 	if result.data == nil || result.header == nil {
 		return "no result"
@@ -194,7 +194,7 @@ func getAllRecordAsString(db *sql.DB, query string) (string, error) {
 	return queryResult.ToOneString(), nil
 }
 
-//get the query result
+// get the query result
 func GetQueryResult(db *sql.DB, query string) (*SqlQueryResult, error) {
 	log.Println("executing sql:", query)
 	result, err := db.Query(query)
@@ -326,7 +326,7 @@ func (result *SqlQueryResult) getPlanScanType() string {
 
 func (result *SqlQueryResult) getQueryResultStringFunc(compareType string) func() string {
 	switch compareType {
-	case ASSERT_TYPE_PLAN:
+	case AssertTypePlan:
 		return result.getPlanScanType
 	default:
 		return result.ToOneString
